@@ -12,11 +12,13 @@ const task = ref(null)
 const formVisible = ref(false)
 const formContainer = ref(null)
 const pomodoroCount = ref(1)
+const notifEnabled = ref(false)
 
 onMounted(() => {
   timerStore.setPomodoro()
   if ('Notification' in window && Notification.permission !== 'granted') {
     Notification.requestPermission()
+    notifEnabled.value = true
   }
 })
 
@@ -101,13 +103,16 @@ watchEffect(() => {
   <div class="bg-emerald-700 container">
     <nav>
       <div class="mx-auto max-w-2xl p-3 flex flex-row justify-between border-b border-emerald-900">
-        <h1 class="text-lg font-bold text-emerald-50">Pomodoro App</h1>
+        <h1 class="text-lg font-bold text-emerald-50">PomoVue</h1>
           <ModalSetting />
         
       </div>
     </nav>
     <div class="content max-w-lg mx-auto py-8 text-emerald-50 flex flex-col">
       <div class="grid gap-6">
+        <div class="bg-emerald-600 w-full p-3 rounded-md" v-if="notifEnabled">
+          Please enable notification by reload the page if you want being notified when timers end.
+        </div>
         <div class="bg-emerald-600 px-4 py-6 md:px-16 rounded flex flex-col">
           <div class="card-nav flex flex-row gap-3 justify-center">
             <button
@@ -189,7 +194,7 @@ watchEffect(() => {
       </div>
       <div class="my-4">
         <div class="text-center">
-          time you focused today : {{ timerStore.timeFocus }}
+          time you focused today : {{ timerStore.timeFocus }} minutes
         </div>
       </div>
     </div>

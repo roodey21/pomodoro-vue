@@ -43,7 +43,7 @@ onMounted(() => {
       </h3>
       <div class="flex flex-row gap-2 items-center">
         <span class="font-semibold text-slate-800/70">
-          {{ pomodoroCount + '/' + task.count }}
+          <!-- {{ pomodoroCount + '/' + task.count }} -->
         </span>
         <div class="relative dropdown-wrapper">
             <button
