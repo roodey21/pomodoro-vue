@@ -11,7 +11,8 @@ onMounted(() => {
 const task = ref({
   id: Date.now(),
   name: '',
-  count: 1,
+  count: 0,
+  target: 1,
   notes: '',
   isCompleted: false
 })
@@ -21,7 +22,7 @@ const closeForm = () => {
   emit('close-form')
 }
 const addTask = () => {
-  if(task.value.name === '') {
+  if (task.value.name === '') {
     alert('Task name cannot be empty')
     return
   }

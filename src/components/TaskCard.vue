@@ -1,39 +1,54 @@
 <script setup>
-import { onMounted, ref } from "vue"
+import { computed, defineProps, onMounted, ref } from 'vue'
+import { useDatabaseStore } from '../stores/database';
 
 const emit = defineEmits(['delete-task', 'edit-task'])
 const mouseIsInside = ref(false)
+const { taskActive, setTaskActive } = useDatabaseStore()
+
+const props = defineProps(['task'])
 
 const handleClickOutside = (event) => {
-    if(event.target.closest('.dropdown-wrapper') === null) {
-        showDropdown.value = false
-    }
+  if (event.target.closest('.dropdown-wrapper') === null) {
+    showDropdown.value = false
+  }
 }
 
-const pomodoroCount = ref(0)
-defineProps(['task'])
+const setTaskAsActive = () => {
+  setTaskActive(props.task)
+}
+
+const isActive = computed(() => {
+  return taskActive.id === props.task.id
+})
 
 const showDropdown = ref(false)
 const deleteTask = () => {
-    emit('delete-task')
+  emit('delete-task')
 }
 const editTask = () => {
-    emit('edit-task')
+  emit('edit-task')
 }
 
 onMounted(() => {
-    document.addEventListener('click', handleClickOutside)
+  document.addEventListener('click', handleClickOutside)
 })
 </script>
 
 <template>
   <div
-    class="px-3 py-2 w-full bg-white text-slate-900 rounded flex flex-col border-l-4 border-slate-900 group hover:cursor-pointer"
+    :class="{
+      'border-slate-900': isActive,
+      'hover:border-slate-900/30': !isActive
+    }"
+    class="px-3 py-2 w-full bg-white text-slate-900 rounded flex flex-col border-l-[6px] group hover:cursor-pointer"
+    @click="setTaskAsActive"
   >
     <div class="flex flex-row items-center justify-between py-2">
       <h3 class="flex items-center font-semibold text-lg">
-        <span class="material-icons font-bold mr-2 opacity-70 group-hover:opacity-100"
-          :class="{'opacity-100 text-emerald-600': task.isCompleted}"
+        <span
+          class="material-icons font-bold mr-2 opacity-70 group-hover:opacity-100"
+          :class="{ 'opacity-100 text-emerald-600': task.isCompleted }"
           @click="task.isCompleted = !task.isCompleted"
           >check_circle</span
         >
@@ -43,29 +58,43 @@ onMounted(() => {
       </h3>
       <div class="flex flex-row gap-2 items-center">
         <span class="font-semibold text-slate-800/70">
-          <!-- {{ pomodoroCount + '/' + task.count }} -->
+          {{ task.count + ' /' + task.target }}
         </span>
         <div class="relative dropdown-wrapper">
+          <button
+            class="p-1 rounded text-slate-400 bg-white hover:bg-slate-200/40 flex flex-row border border-slate-400/50"
+            @click="showDropdown = !showDropdown"
+          >
+            <span class="material-icons font-bold">more_vert</span>
+          </button>
+          <div
+            @mouseenter="mouseIsInside = true"
+            @mouseleave="mouseIsInside = false"
+            class="absolute right-0 top-2 translate-y-1/2 bg-white shadow-lg rounded p-1 w-48 z-20 border"
+            v-show="showDropdown"
+          >
             <button
-              class="p-1 rounded text-slate-400 bg-white hover:bg-slate-200/40 flex flex-row border border-slate-400/50"
-              @click="showDropdown = !showDropdown"
+              class="flex flex-row items-center gap-2 hover:bg-slate-200 w-full p-1 rounded"
+              @click="markAsCompleted"
             >
-              <span class="material-icons font-bold">more_vert</span>
+              <span class="material-icons font-bold !text-sm">check_circle</span>
+              <span class="text-sm">Mark As Completed</span>
             </button>
-            <div @mouseenter="mouseIsInside = true" @mouseleave="mouseIsInside = false" class="absolute right-0 top-2 translate-y-1/2 bg-white shadow-lg rounded p-1 w-48 z-20 border" v-show="showDropdown">
-              <button class="flex flex-row items-center gap-2 hover:bg-slate-200 w-full p-1 rounded" @click="markAsCompleted">
-                <span class="material-icons font-bold !text-sm">check_circle</span>
-                <span class="text-sm">Mark As Completed</span>
-              </button>
-              <button class="flex flex-row items-center gap-2 hover:bg-slate-200 w-full p-1 rounded" @click="editTask">
-                <span class="material-icons font-bold !text-sm">edit</span>
-                <span class="text-sm">Edit</span>
-              </button>
-              <button class="flex flex-row items-center gap-2 hover:bg-slate-200 w-full p-1 rounded" @click="deleteTask">
-                <span class="material-icons font-bold !text-sm">delete</span>
-                <span class="text-sm">Delete</span>
-              </button>
-            </div>
+            <button
+              class="flex flex-row items-center gap-2 hover:bg-slate-200 w-full p-1 rounded"
+              @click="editTask"
+            >
+              <span class="material-icons font-bold !text-sm">edit</span>
+              <span class="text-sm">Edit</span>
+            </button>
+            <button
+              class="flex flex-row items-center gap-2 hover:bg-slate-200 w-full p-1 rounded"
+              @click="deleteTask"
+            >
+              <span class="material-icons font-bold !text-sm">delete</span>
+              <span class="text-sm">Delete</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -76,4 +105,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-

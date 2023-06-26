@@ -7,7 +7,7 @@ import TaskCard from '../components/TaskCard.vue'
 import ModalSetting from '../components/ModalSetting.vue'
 
 const timerStore = useTimerStore()
-const { tasks } = useDatabaseStore()
+const { tasks, taskActive, setTaskActive } = useDatabaseStore()
 const task = ref(null)
 const formVisible = ref(false)
 const formContainer = ref(null)
@@ -35,6 +35,9 @@ const resetPomodoro = () => {
 }
 const addTask = (item) => {
   tasks.push(item)
+  if (taskActive.id === null) {
+    setTaskActive(item)
+  }
   formVisible.value = false
 }
 
@@ -64,6 +67,10 @@ const nextSession = () => {
     getAllPomodoroAfterLongBreak(timerStore.sessions).length === 4
       ? timerStore.setLongBreak()
       : timerStore.setShortBreak()
+    if(taskActive.id !== null) {
+      let task = tasks.find((task) => task.id === taskActive.id)
+      task.count++
+    }
   } else {
     timerStore.setPomodoro()
   }
@@ -76,19 +83,19 @@ function getAllPomodoroAfterLongBreak(array) {
 
   for (let i = array.length - 1; i >= 0; i--) {
     const currentSession = array[i]
-    
+
     if (currentSession.sessionType === 3 && currentSession.isCompleted) {
-      isFound = true;
+      isFound = true
       continue
     }
-    
+
     if (currentSession.sessionType === 1 && currentSession.isCompleted) {
-      sessions.push(currentSession);
+      sessions.push(currentSession)
     }
     if (isFound) break
   }
-  
-  return sessions;
+
+  return sessions
 }
 
 watchEffect(() => {
@@ -104,8 +111,7 @@ watchEffect(() => {
     <nav>
       <div class="mx-auto max-w-2xl p-3 flex flex-row justify-between border-b border-emerald-900">
         <h1 class="text-lg font-bold text-emerald-50">PomoVue</h1>
-          <ModalSetting />
-        
+        <ModalSetting />
       </div>
     </nav>
     <div class="content max-w-lg mx-auto py-8 text-emerald-50 flex flex-col">
@@ -158,12 +164,11 @@ watchEffect(() => {
           </div>
         </div>
         <div class="text-center mb-5">
-          <h2
-            class="hover:cursor-pointer hover:opacity-70"
-            @click="resetPomodoro()"
-          >#{{ timerStore.currentSession == 1 ? pomodoroCount : pomodoroCount-1 }}</h2>
+          <h2 class="hover:cursor-pointer hover:opacity-70" @click="resetPomodoro()">
+            #{{ timerStore.currentSession == 1 ? pomodoroCount : pomodoroCount - 1 }}
+          </h2>
           <h4>
-            {{ timerStore.currentSession == 1 ? 'Time To Focus':'Let\'s Take a Break' }}
+            {{ timerStore.currentSession == 1 ? 'Time To Focus' : "Let's Take a Break" }}
           </h4>
         </div>
       </div>
@@ -179,7 +184,13 @@ watchEffect(() => {
           </button>
         </div>
         <div class="flex flex-col gap-y-2" v-if="tasks.length">
-          <TaskCard v-for="task in tasks" :key="task.id" :task="task" @delete-task="deleteTask(task.id)" @edit-task="editTask(task.id)"/>
+          <TaskCard
+            v-for="task in tasks"
+            :key="task.id"
+            :task="task"
+            @delete-task="deleteTask(task.id)"
+            @edit-task="editTask(task.id)"
+          />
         </div>
         <div v-if="formVisible" ref="formContainer">
           <FormInput @close-form="showForm" @add-task="addTask" />
@@ -193,9 +204,7 @@ watchEffect(() => {
         </button>
       </div>
       <div class="my-4">
-        <div class="text-center">
-          time you focused today : {{ timerStore.timeFocus }} minutes
-        </div>
+        <div class="text-center">time you focused today : {{ timerStore.timeFocus }} minutes</div>
       </div>
     </div>
   </div>
