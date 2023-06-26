@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-emerald-700;
+}
+
+input,
+textarea {
+  @apply focus-visible:outline-none;
+}
+
+@layer base {
+  input[type='number'].no-arrow::-webkit-inner-spin-button,
+  input[type='number'].no-arrow::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
