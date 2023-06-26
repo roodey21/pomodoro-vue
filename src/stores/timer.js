@@ -3,9 +3,9 @@ import { computed, ref } from 'vue'
 
 export const useTimerStore = defineStore('timer', () => {
   const timer = ref(0)
-  const shortBreak = ref(6)
-  const longBreak = ref(7)
-  const pomodoro = ref(5)
+  const shortBreak = ref(25)
+  const longBreak = ref(5)
+  const pomodoro = ref(15)
   const isRunning = ref(false)
   const session = [
     { id: 1, name: 'Pomodoro' },
